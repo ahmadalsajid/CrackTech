@@ -26,7 +26,7 @@ class Question(models.Model):
     option_2 = models.CharField(max_length=255, null=True, blank=True)
     option_3 = models.CharField(max_length=255, null=True, blank=True)
     option_4 = models.CharField(max_length=255, null=True, blank=True)
-    right_answer = models.IntegerField(null=True, blank=True)
+    correct_answer = models.IntegerField(null=True, blank=True)
     tags = models.ManyToManyField(Tag, related_name='questions', blank=True)
     users = models.ManyToManyField(User, related_name='questions', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -38,17 +38,17 @@ class Question(models.Model):
     class Meta:
         ordering = ['-created_at']
 
-# @receiver(pre_save, sender=Question)
-# def set_question_Tags(sender, instance, **kwargs):
-#     try:
-#         _tags = []
-#         reset_queries()
-#         for t in instance.tags.select_related('parent').all():
-#             while t:
-#                 _tags.append(t)
-#                 if not t.parent:
-#                     break
-#                 t = t.parent
-#         instance.tags.set(list(set(_tags)))
-#     except Exception as e:
-#         pass
+@receiver(pre_save, sender=Question)
+def set_question_tags(sender, instance, **kwargs):
+    try:
+        _tags = []
+        reset_queries()
+        for t in instance.tags.select_related('parent').all():
+            while t:
+                _tags.append(t)
+                if not t.parent:
+                    break
+                t = t.parent
+        instance.tags.set(list(set(_tags)))
+    except Exception as e:
+        pass

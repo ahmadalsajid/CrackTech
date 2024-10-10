@@ -14,7 +14,7 @@ class TagAdmin(admin.ModelAdmin):
 
 
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('question', 'right_answer',)
+    list_display = ('question', 'correct_answer',)
     search_fields = ('question',)
 
     def save_related(self, request, form, formsets, change):
