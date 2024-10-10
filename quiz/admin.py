@@ -18,7 +18,6 @@ class QuestionAdmin(admin.ModelAdmin):
     search_fields = ('question',)
 
     def save_related(self, request, form, formsets, change):
-        pprint(form.cleaned_data)
         _selected_tags = form.cleaned_data['tags']
         _tags = []
         if _selected_tags:
@@ -29,7 +28,6 @@ class QuestionAdmin(admin.ModelAdmin):
                         break
                     t = t.parent
         _tags = list(set(_tags))
-        print(_tags)
         form.cleaned_data['tags'] = _tags
         super(QuestionAdmin, self).save_model(request, form, formsets, change)
 
