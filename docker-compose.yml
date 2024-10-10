@@ -1,5 +1,29 @@
 services:
 
+  redis:
+    image: redis:latest
+    container_name: redis
+    hostname: redis
+    command: [ "redis-server" ]
+    ports:
+      - 6379:6379
+#    volumes:
+#      - redis-data:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      interval: 30s
+      timeout: 3s
+      retries: 5
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    restart: unless-stopped
+    ports:
+      - 5540:5540
+    depends_on:
+      - redis
+#    volumes:
+#      - redis-insight:/data
   api:
     build: .
     container_name: api
@@ -12,8 +36,8 @@ services:
       - .env
     ports:
       - 8000:8000
-#    depends_on:
-#      - postgres
+    depends_on:
+      - redis
 
 #  postgres:
 #    image: postgres:latest
@@ -42,6 +66,8 @@ services:
 #      - postgres
 
 #volumes:
+#  redis-data:
+#  redis-insight
 #  rabbitmq_data:
 #  pg_data:
 #  pgadmin_data:

@@ -8,6 +8,9 @@ from quiz.models import Tag
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
+from django.utils.decorators import method_decorator
+from django.views.decorators.vary import vary_on_cookie
+from django.views.decorators.cache import cache_page
 
 
 class CustomPagination(PageNumberPagination):
@@ -20,6 +23,8 @@ class CustomPagination(PageNumberPagination):
 class TagViewSet(viewsets.ViewSet):
     pagination_class = CustomPagination
 
+    @method_decorator(cache_page(60 * 15))  #( second x minute)
+    @method_decorator(vary_on_cookie)
     def list(self, request):
         queryset = Tag.objects.all()
         paginator = self.pagination_class()
