@@ -29,6 +29,10 @@ SECRET_KEY = 'django-insecure-@sh5-w)(7207%k-=ye*_%i-$dc$7jmc_ya%u0ejz7glgkq*9wb
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+# django-debug-toolbar
+INTERNAL_IPS = [
+    "127.0.0.1",
+ ]
 
 # Application definition
 
@@ -49,11 +53,13 @@ INSTALLED_APPS = [
     'celery',
     'drf_spectacular',
     'rangefilter',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
