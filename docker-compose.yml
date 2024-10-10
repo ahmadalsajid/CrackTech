@@ -1,0 +1,47 @@
+services:
+
+  api:
+    build: .
+    container_name: api
+    hostname: api
+    command: gunicorn --workers=3 --timeout=120 --bind 0.0.0.0:8000 cracktech.wsgi --reload
+    restart: unless-stopped
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+#    depends_on:
+#      - postgres
+
+#  postgres:
+#    image: postgres:latest
+#    container_name: postgres
+#    hostname: postgres
+#    restart: unless-stopped
+#    ports:
+#      - 5432:5432
+#    env_file:
+#      - .env
+#    volumes:
+#      - pg_data:/var/lib/postgresql/data
+#
+#  pgadmin:
+#    image: dpage/pgadmin4:latest
+#    container_name: pgadmin
+#    hostname: pgadmin
+#    restart: unless-stopped
+#    ports:
+#      - 8888:80
+#    env_file:
+#      - .env
+#    volumes:
+#      - pgadmin_data:/var/lib/pgadmin
+#    depends_on:
+#      - postgres
+
+#volumes:
+#  rabbitmq_data:
+#  pg_data:
+#  pgadmin_data:
