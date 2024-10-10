@@ -1,6 +1,6 @@
 from pprint import pprint
 from django.contrib import admin
-from quiz.models import Tag, Question
+from quiz.models import Tag, Question, FavoriteQuestion, ReadQuestion
 
 
 class TagInline(admin.TabularInline):
@@ -32,5 +32,16 @@ class QuestionAdmin(admin.ModelAdmin):
         super(QuestionAdmin, self).save_model(request, form, formsets, change)
 
 
+class FavoriteQuestionAdmin(admin.ModelAdmin):
+    list_display = ('get_question', 'get_user',)
+    search_fields = ('question__question', 'user__username', 'user__email', 'user__first_name', 'user__last_name')
+
+
+class ReadQuestionAdmin(admin.ModelAdmin):
+    list_display = ('get_question', 'get_user',)
+    search_fields = ('question__question', 'user__username', 'user__email', 'user__first_name', 'user__last_name')
+
 admin.site.register(Tag, TagAdmin)
 admin.site.register(Question, QuestionAdmin)
+admin.site.register(FavoriteQuestion, FavoriteQuestionAdmin)
+admin.site.register(ReadQuestion, ReadQuestionAdmin)
