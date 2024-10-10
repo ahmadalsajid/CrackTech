@@ -1,12 +1,16 @@
+import requests
+import time
+import os
 from icecream import ic
 from django.core.management.base import BaseCommand
 from quiz.models import Tag, Question
 from faker import Faker
 from pprint import pprint
-from datetime import date, timedelta
-import requests
-import time
-from random import randint, choices, sample
+from random import randint, sample
+from users.models import User
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class Command(BaseCommand):
@@ -47,37 +51,58 @@ class Command(BaseCommand):
             # _syntax = Tag.objects.create(name='Syntax', parent=_eng_lang)
             # _wo = Tag.objects.create(name='Word Order', parent=_syntax)
             # _st = Tag.objects.create(name='Sentence Types', parent=_syntax)
+            #
+            # # create Random questions and add random tags
+            # _all_tags = list(Tag.objects.values_list('id', flat=True))
+            # results = []
+            # for _ in range(6):
+            #     response = requests.get('https://opentdb.com/api.php?amount=50&difficulty=easy&type=multiple')
+            #     results.extend(response.json().get('results'))
+            #     time.sleep(10)
+            #
+            # for result in results:
+            #     # _selected_tags = choices(_all_tags)
+            #     _selected_tags = sample(_all_tags, randint(1, 3))
+            #     _options = result.get('incorrect_answers')
+            #     _correct_answer = result.get('correct_answer')
+            #     _correct_answer_position = randint(0, 3)
+            #     _options.insert(_correct_answer_position, _correct_answer)
+            #     question = Question.objects.create(
+            #         question=result.get('question').replace('&quot;', "'").replace('&#039;', "'"),
+            #         correct_answer=_correct_answer_position + 1,
+            #         option_1=_options[0].replace('&quot;', "'").replace('&#039;', "'"),
+            #         option_2=_options[1].replace('&quot;', "'").replace('&#039;', "'"),
+            #         option_3=_options[2].replace('&quot;', "'").replace('&#039;', "'"),
+            #         option_4=_options[3].replace('&quot;', "'").replace('&#039;', "'"),
+            #     )
+            #     _passed_tags = Tag.objects.filter(pk__in=_selected_tags)
+            #     _tags = []
+            #     for t in _passed_tags:
+            #         while t:
+            #             _tags.append(t)
+            #             if not t.parent:
+            #                 break
+            #             t = t.parent
+            #     question.tags.set(list(set(_tags)))
 
-            _all_tags = list(Tag.objects.values_list('id', flat=True))
-            results = []
-            for _ in range(6):
-                response = requests.get('https://opentdb.com/api.php?amount=50&difficulty=easy&type=multiple')
-                results.extend(response.json().get('results'))
-                time.sleep(10)
-
-            for result in results:
-                # _selected_tags = choices(_all_tags)
-                _selected_tags = sample(_all_tags, randint(1, 3))
-                _options = result.get('incorrect_answers')
-                _correct_answer = result.get('correct_answer')
-                _correct_answer_position = randint(0, 3)
-                _options.insert(_correct_answer_position, _correct_answer)
-                question = Question.objects.create(
-                    question=result.get('question').replace('&quot;', "'").replace('&#039;', "'"),
-                    correct_answer=_correct_answer_position + 1,
-                    option_1=_options[0].replace('&quot;', "'").replace('&#039;', "'"),
-                    option_2=_options[1].replace('&quot;', "'").replace('&#039;', "'"),
-                    option_3=_options[2].replace('&quot;', "'").replace('&#039;', "'"),
-                    option_4=_options[3].replace('&quot;', "'").replace('&#039;', "'"),
+            # create Users
+            #password from .env
+            _password = os.getenv('DJANGO_SUPERUSER_PASSWORD', '1qweqwe23')
+            for _ in range(50):
+                _f_name = fake.first_name()
+                _l_name = fake.last_name()
+                _full_name = f'{_f_name} {_l_name}'
+                _username = f'{_f_name.lower()}.{_l_name.lower()}'
+                _email = f'{_username}@student.com'
+                _user = User.objects.create(
+                    username = _username,
+                    first_name = _f_name,
+                    last_name = _l_name,
+                    email = _email,
+                    password = _password,
+                    phone = fake.phone_number(),
+                    is_verified = True,
                 )
-                _passed_tags = Tag.objects.filter(pk__in=_selected_tags)
-                _tags = []
-                for t in _passed_tags:
-                    while t:
-                        _tags.append(t)
-                        if not t.parent:
-                            break
-                        t = t.parent
-                question.tags.set(list(set(_tags)))
+
         except Exception as e:
             ic(e)
