@@ -15,8 +15,10 @@ services:
       timeout: 3s
       retries: 5
 
-  redis-insight:
+  redisinsight:
     image: redis/redisinsight:latest
+    container_name: redisinsight
+    hostname: redisinsight
     restart: unless-stopped
     ports:
       - 5540:5540
