@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError, transaction
-from drf_spectacular.utils import extend_schema, PolymorphicProxySerializer
+from drf_spectacular.utils import extend_schema
 from rest_framework import status
 from icecream import ic
 from quiz.serializers import TagSerializer, QuestionSerializer, FavoriteSerializer
@@ -27,13 +27,13 @@ class TagViewSet(viewsets.ViewSet):
         # return Response(_serialize.data, status=status.HTTP_200_OK)
         return paginator.get_paginated_response(_serialize.data)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, pk=None):    # pk = id of Question
         pass
 
-    def partial_update(self, request, pk=None):
+    def partial_update(self, request, pk=None):    # pk = id of Question
         pass
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request, pk=None):    # pk = id of Question
         pass
 
 
@@ -50,19 +50,23 @@ class QuestionViewSet(viewsets.ViewSet):
         # return Response(_serialize.data, status=status.HTTP_200_OK)
         return paginator.get_paginated_response(_serialize.data)
 
-    def retrieve(self, request, pk=None):
+    def retrieve(self, request, pk=None):    # pk = id of Question
         pass
 
-    def partial_update(self, request, pk=None):
+    def partial_update(self, request, pk=None):    # pk = id of Question
         pass
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request, pk=None):    # pk = id of Question
         pass
 
 
 class FavoriteViewSet(viewsets.ViewSet):
     pagination_class = CustomPagination
 
+    @extend_schema(
+        description='Get favorite questions',
+        responses=QuestionSerializer(many=True),
+    )
     @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_cookie)
     def list(self, request):
@@ -81,21 +85,20 @@ class FavoriteViewSet(viewsets.ViewSet):
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    def create(self, request, pk=None):
+    @extend_schema(
+        description='Mark question(s) as favorite',
+        responses=QuestionSerializer(many=True),
+    )
+    def create(self, request, pk=None):    # pk = id of Question
         _user = request.user
         try:
-            _question_ids = request.data.get('question_ids', None)
-            if not _question_ids:
-                raise Exception(
-                    'You must pass Question IDs as an array, i.e. question_ids: [1,2,3] in the request body')
             if FavoriteQuestion.objects.filter(user=_user).exists():
                 # the user already has favorites, just update it
-                _user.favorite.questions.add(*_question_ids)
+                _user.favorite.questions.add(pk)
             else:
                 # the user is marking for the first time, create one for now
-                _questions = Question.objects.filter(id__in=_question_ids)
                 FavoriteQuestion.objects.create(user=_user)
-                _user.favorite.questions.add(*_question_ids)
+                _user.favorite.questions.add(pk)
 
             paginator = self.pagination_class()
             queryset = _user.favorite.questions.all()
@@ -106,25 +109,22 @@ class FavoriteViewSet(viewsets.ViewSet):
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request, pk=None):    # pk = id of Question
         _user = request.user
         try:
-            _question_ids = request.data.get('question_ids', None)
-            if not _question_ids:
-                raise Exception(
-                    'You must pass Question IDs as an array, i.e. question_ids: [1,2,3] in the request body')
             if FavoriteQuestion.objects.filter(user=_user).exists():
                 # the user already has favorites, just update it
-                _user.favorite.questions.remove(*_question_ids)
+                _user.favorite.questions.remove(pk)
             else:
                 # the user does not fave any favorite, so delete is not allowed
                 raise Exception('The user has no favorite questions')
 
-            paginator = self.pagination_class()
-            queryset = _user.favorite.questions.all()
-            result_page = paginator.paginate_queryset(queryset, request)
-            _serialize = QuestionSerializer(result_page, many=True)
-            return paginator.get_paginated_response(_serialize.data)
+            return Response(
+                {
+                    'detail': 'Removed question from favorite',
+                },
+                status=status.HTTP_204_NO_CONTENT,
+            )
         except Exception as e:
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
@@ -133,6 +133,10 @@ class FavoriteViewSet(viewsets.ViewSet):
 class ReadViewSet(viewsets.ViewSet):
     pagination_class = CustomPagination
 
+    @extend_schema(
+        description='Get read questions',
+        responses=QuestionSerializer(many=True),
+    )
     @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_cookie)
     def list(self, request):
@@ -150,21 +154,20 @@ class ReadViewSet(viewsets.ViewSet):
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    def create(self, request, pk=None):
+    @extend_schema(
+        description='Mark question(s) as Read',
+        responses=QuestionSerializer(many=True),
+    )
+    def create(self, request, pk=None):    # pk = id of Question
         _user = request.user
         try:
-            _question_ids = request.data.get('question_ids', None)
-            if not _question_ids:
-                raise Exception(
-                    'You must pass Question IDs as an array, i.e. question_ids: [1,2,3] in the request body')
             if ReadQuestion.objects.filter(user=_user).exists():
                 # the user already has favorites, just update it
-                _user.read.questions.add(*_question_ids)
+                _user.read.questions.add(pk)
             else:
                 # the user is marking for the first time, create one for now
-                _questions = Question.objects.filter(id__in=_question_ids)
                 ReadQuestion.objects.create(user=_user)
-                _user.read.questions.add(*_question_ids)
+                _user.read.questions.add(pk)
 
             paginator = self.pagination_class()
             queryset = _user.favorite.questions.all()
@@ -175,25 +178,22 @@ class ReadViewSet(viewsets.ViewSet):
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):
+    def destroy(self, request, pk=None):    # pk = id of Question
         _user = request.user
         try:
-            _question_ids = request.data.get('question_ids', None)
-            if not _question_ids:
-                raise Exception(
-                    'You must pass Question IDs as an array, i.e. question_ids: [1,2,3] in the request body')
             if ReadQuestion.objects.filter(user=_user).exists():
                 # the user already has favorites, just update it
-                _user.read.questions.remove(*_question_ids)
+                _user.read.questions.remove(pk)
             else:
                 # the user does not fave any favorite, so delete is not allowed
                 raise Exception('The user has no read questions')
 
-            paginator = self.pagination_class()
-            queryset = _user.favorite.questions.all()
-            result_page = paginator.paginate_queryset(queryset, request)
-            _serialize = QuestionSerializer(result_page, many=True)
-            return paginator.get_paginated_response(_serialize.data)
+            return Response(
+                {
+                    'detail': 'Removed question from read',
+                },
+                status=status.HTTP_204_NO_CONTENT,
+            )
         except Exception as e:
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)

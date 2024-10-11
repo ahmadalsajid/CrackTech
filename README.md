@@ -20,3 +20,4 @@ $ docker compose down --rmi local -v
 * https://stackoverflow.com/questions/47867760/django-quiz-app-model-for-multiple-choice-questions
 * https://www.django-rest-framework.org/api-guide/caching/
 * https://forum.djangoproject.com/t/redis-cache-in-django-5-0/27131
+* https://stackoverflow.com/questions/71431687/how-to-generate-a-schema-for-a-custom-pagination-in-django-rfw-with-drf-spectacu
