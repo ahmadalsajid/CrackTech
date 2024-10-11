@@ -15,8 +15,10 @@ urlpatterns = [
     })),
     path('favorites/', FavoriteViewSet.as_view({
         'get': 'list',
+        'post': 'create',
     })),
     path('reads/', ReadViewSet.as_view({
         'get': 'list',
+        'post': 'create',
     })),
 ]
