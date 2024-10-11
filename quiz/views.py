@@ -106,6 +106,29 @@ class FavoriteViewSet(viewsets.ViewSet):
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
+    def destroy(self, request, pk=None):
+        _user = request.user
+        try:
+            _question_ids = request.data.get('question_ids', None)
+            if not _question_ids:
+                raise Exception(
+                    'You must pass Question IDs as an array, i.e. question_ids: [1,2,3] in the request body')
+            if FavoriteQuestion.objects.filter(user=_user).exists():
+                # the user already has favorites, just update it
+                _user.favorite.questions.remove(*_question_ids)
+            else:
+                # the user does not fave any favorite, so delete is not allowed
+                raise Exception('The user has no favorite questions')
+
+            paginator = self.pagination_class()
+            queryset = _user.favorite.questions.all()
+            result_page = paginator.paginate_queryset(queryset, request)
+            _serialize = QuestionSerializer(result_page, many=True)
+            return paginator.get_paginated_response(_serialize.data)
+        except Exception as e:
+            ic(e)
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
+
 
 class ReadViewSet(viewsets.ViewSet):
     pagination_class = CustomPagination
@@ -151,3 +174,26 @@ class ReadViewSet(viewsets.ViewSet):
         except Exception as e:
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def destroy(self, request, pk=None):
+        _user = request.user
+        try:
+            _question_ids = request.data.get('question_ids', None)
+            if not _question_ids:
+                raise Exception(
+                    'You must pass Question IDs as an array, i.e. question_ids: [1,2,3] in the request body')
+            if ReadQuestion.objects.filter(user=_user).exists():
+                # the user already has favorites, just update it
+                _user.read.questions.remove(*_question_ids)
+            else:
+                # the user does not fave any favorite, so delete is not allowed
+                raise Exception('The user has no read questions')
+
+            paginator = self.pagination_class()
+            queryset = _user.favorite.questions.all()
+            result_page = paginator.paginate_queryset(queryset, request)
+            _serialize = QuestionSerializer(result_page, many=True)
+            return paginator.get_paginated_response(_serialize.data)
+        except Exception as e:
+            ic(e)
+            return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
