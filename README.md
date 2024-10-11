@@ -1,10 +1,30 @@
 # CrackTech
 
 Coding round
+## Run the project ##  
 
+You need to have docker installed on your machine for testing the application
+easily. To install Docker on your machine, please follow the official
+documentation from [Docker](https://docs.docker.com/engine/install/).
+
+After that, clone this repository to your machine.
+
+```commandline
+git clone https://github.com/ahmadalsajid/CrackTech.git
+```
+Now, `cd` into the `CrackTech` directory and rename `sample.env` to `env`. Put 
+your own credentials there, if you want to. Now, spin up the containers
 ```
 $ docker compose up
 ```
+
+After all the containers are up and running, execute the custom command to 
+populate some data for testing. It might take ~10 minutes.
+
+```
+$ docker compose exec api python /app/manage.py create_data
+```
+
 
 Once you are done, remove all the containers and associated objects by
 
@@ -22,9 +42,10 @@ The user can:
 * Add questions to their "Favorite" list or remove them.
     * Mark Favorite Question API: [Mark Question as Favorite API](#mark-question-as-favorite-api)
     * Remove Favorite Question API: [Remove Question as Favorite API](#remove-question-as-favorite-api)
-* Use a filter option at the top of the page to view only "Read" questions (e.g., if the user
-* has marked 10 questions as read, they will see only those 10).
+* Use a filter option at the top of the page to view only "Read" questions (e.g., if the user has marked 10 questions as read, they will see only those 10).
+    * All Read Questions API: [View All Read Question API](#view-all-read-question-api) 
 * Filter for "Unread" questions, excluding those 10.
+    * All unread Questions API: [View All Unread Question API](#view-all-unread-question-api)
 * View all their "Favorite" questions.
     * All Favorite questions API: [View All Favorite Question API](#view-all-favorite-question-api)
 
@@ -62,7 +83,7 @@ Content-Type: application/json; charset=utf-8
 
 ### Mark Question as Read API
 
-Make a `POST` request to <http://localhost:8000/api/quiz/reads/<int:question_id>/> with the `JWT token` in the
+Make a `POST` request to <http://localhost:8000/api/quiz/reads/int:question_id/> with the `JWT token` in the
 Authorization header.
 
 ```bash
@@ -107,7 +128,7 @@ Content-Type: application/json; charset=utf-8
 
 ### Mark Question as Unread API
 
-Make a `DELETE` request to <http://localhost:8000/api/quiz/reads/<int:question_id>/> with the `JWT token` in the
+Make a `DELETE` request to <http://localhost:8000/api/quiz/reads/int:question_id/> with the `JWT token` in the
 Authorization header.
 
 ```bash
@@ -128,7 +149,7 @@ Content-Type: application/json; charset=utf-8
 
 ### Mark Question as Favorite API
 
-Make a `POST` request to <http://localhost:8000/api/quiz/favorites/<int:question_id>/> with the `JWT token` in the
+Make a `POST` request to <http://localhost:8000/api/quiz/favorites/int:question_id/> with the `JWT token` in the
 Authorization header.
 
 ```bash
@@ -173,7 +194,7 @@ Content-Type: application/json; charset=utf-8
 
 ### Remove Question as Favorite API
 
-Make a `DELETE` request to <http://localhost:8000/api/quiz/favorites/<int:question_id>/> with the `JWT token` in the
+Make a `DELETE` request to <http://localhost:8000/api/quiz/favorites/int:question_id/> with the `JWT token` in the
 Authorization header.
 
 ```bash
@@ -191,7 +212,6 @@ Content-Type: application/json; charset=utf-8
     "detail": "Removed question from favorite"
 }
 ```
-
 
 ### View All Favorite Question API
 
@@ -237,6 +257,98 @@ Content-Type: application/json; charset=utf-8
         ...
 }
 ```
+
+
+### View All Read Question API
+
+Make a `GET` request to <http://localhost:8000/api/quiz/reads/> with the `JWT token` in the
+Authorization header. Also, you can paginate appending the query params, i.e. `?page=1&page_size=20`
+
+```bash
+GET http://localhost:8000/api/quiz/reads/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1
+```
+
+You will get the response in a JSON format
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+{
+    "count": 9,
+    "next": "http://localhost:8000/api/quiz/favorites/?page=2&page_size=20",
+    "previous": null,
+    "results": [
+        {
+            "id": 300,
+            "question": "What album did The Lumineers release in 2016?",
+            "option_1": "Winter",
+            "option_2": "Cleopatra",
+            "option_3": "The Lumineers",
+            "option_4": "Tracks From The Attic",
+            "correct_answer": 2,
+            "created_at": "2024-10-11T00:29:43.475159Z",
+            "updated_at": "2024-10-11T00:29:43.475239Z",
+            "tags": [
+                19,
+                12,
+                7,
+                6,
+                2,
+                1
+            ],
+            "users": []
+        },
+        ...
+}
+```
+
+### View All Unread Question API
+
+Make a `GET` request to <http://localhost:8000/api/quiz/reads/?status=unread> with the `JWT token` in the
+Authorization header. Also, you can paginate appending the query params, i.e. `?page=1&page_size=20`
+
+```bash
+GET http://localhost:8000/api/quiz/reads/?status=unread
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1
+```
+
+You will get the response in a JSON format
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+{
+    "count": 9,
+    "next": "http://localhost:8000/api/quiz/favorites/?page=2&page_size=20",
+    "previous": null,
+    "results": [
+        {
+            "id": 300,
+            "question": "What album did The Lumineers release in 2016?",
+            "option_1": "Winter",
+            "option_2": "Cleopatra",
+            "option_3": "The Lumineers",
+            "option_4": "Tracks From The Attic",
+            "correct_answer": 2,
+            "created_at": "2024-10-11T00:29:43.475159Z",
+            "updated_at": "2024-10-11T00:29:43.475239Z",
+            "tags": [
+                19,
+                12,
+                7,
+                6,
+                2,
+                1
+            ],
+            "users": []
+        },
+        ...
+}
+```
+
 ## References
 
 * https://stackoverflow.com/questions/47867760/django-quiz-app-model-for-multiple-choice-questions

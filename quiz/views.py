@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError, transaction
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status
 from icecream import ic
 from quiz.serializers import TagSerializer, QuestionSerializer, FavoriteSerializer
@@ -27,15 +27,6 @@ class TagViewSet(viewsets.ViewSet):
         # return Response(_serialize.data, status=status.HTTP_200_OK)
         return paginator.get_paginated_response(_serialize.data)
 
-    def retrieve(self, request, pk=None):    # pk = id of Question
-        pass
-
-    def partial_update(self, request, pk=None):    # pk = id of Question
-        pass
-
-    def destroy(self, request, pk=None):    # pk = id of Question
-        pass
-
 
 class QuestionViewSet(viewsets.ViewSet):
     pagination_class = CustomPagination
@@ -49,15 +40,6 @@ class QuestionViewSet(viewsets.ViewSet):
         _serialize = QuestionSerializer(result_page, many=True)
         # return Response(_serialize.data, status=status.HTTP_200_OK)
         return paginator.get_paginated_response(_serialize.data)
-
-    def retrieve(self, request, pk=None):    # pk = id of Question
-        pass
-
-    def partial_update(self, request, pk=None):    # pk = id of Question
-        pass
-
-    def destroy(self, request, pk=None):    # pk = id of Question
-        pass
 
 
 class FavoriteViewSet(viewsets.ViewSet):
@@ -89,7 +71,7 @@ class FavoriteViewSet(viewsets.ViewSet):
         description='Mark question(s) as favorite',
         responses=QuestionSerializer(many=True),
     )
-    def create(self, request, pk=None):    # pk = id of Question
+    def create(self, request, pk=None):  # pk = id of Question
         _user = request.user
         try:
             if FavoriteQuestion.objects.filter(user=_user).exists():
@@ -109,7 +91,7 @@ class FavoriteViewSet(viewsets.ViewSet):
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_404_NOT_FOUND)
 
-    def destroy(self, request, pk=None):    # pk = id of Question
+    def destroy(self, request, pk=None):  # pk = id of Question
         _user = request.user
         try:
             if FavoriteQuestion.objects.filter(user=_user).exists():
@@ -134,21 +116,30 @@ class ReadViewSet(viewsets.ViewSet):
     pagination_class = CustomPagination
 
     @extend_schema(
+        parameters=[
+            OpenApiParameter(name='status',
+                             description='Filter by Question read or unread',
+                             required=False,
+                             type=str,
+                             enum=['read', 'unread']),
+        ],
         description='Get read questions',
         responses=QuestionSerializer(many=True),
     )
     @method_decorator(cache_page(60 * 15))
     @method_decorator(vary_on_cookie)
     def list(self, request):
-        reset_queries()
         _user = request.user
+        _read_status = request.GET.get('status', 'read')  # choices = [read, unread]
         try:
             paginator = self.pagination_class()
-            queryset = _user.read.questions.all()
+            if _read_status.lower() == 'unread':
+                _excluded_questions = list(_user.read.questions.values_list('id', flat=True)) if _user.read else []
+                queryset = Question.objects.exclude(id__in=_excluded_questions)
+            else:
+                queryset = _user.read.questions.all()
             result_page = paginator.paginate_queryset(queryset, request)
             _serialize = QuestionSerializer(result_page, many=True)
-            ic(connection.queries)
-            ic(len(connection.queries))
             return paginator.get_paginated_response(_serialize.data)
         except Exception as e:
             ic(e)
@@ -158,7 +149,7 @@ class ReadViewSet(viewsets.ViewSet):
         description='Mark question(s) as Read',
         responses=QuestionSerializer(many=True),
     )
-    def create(self, request, pk=None):    # pk = id of Question
+    def create(self, request, pk=None):  # pk = id of Question
         _user = request.user
         try:
             if ReadQuestion.objects.filter(user=_user).exists():
@@ -178,7 +169,7 @@ class ReadViewSet(viewsets.ViewSet):
             ic(e)
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    def destroy(self, request, pk=None):    # pk = id of Question
+    def destroy(self, request, pk=None):  # pk = id of Question
         _user = request.user
         try:
             if ReadQuestion.objects.filter(user=_user).exists():

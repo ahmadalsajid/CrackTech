@@ -98,23 +98,23 @@ DB_PASSWORD = os.getenv('POSTGRES_PASSWORD')
 DB_HOST = os.getenv('POSTGRES_HOST', '127.0.0.1')
 DB_PORT = os.getenv('POSTGRES_PORT', 5432)
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': DB_NAME,
-#         'USER': DB_USER,
-#         'PASSWORD': DB_PASSWORD,
-#         'HOST': DB_HOST,
-#         'PORT': DB_PORT,
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': DB_NAME,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 CACHES = {
     "default": {

@@ -7,8 +7,8 @@ services:
     command: [ "redis-server" ]
     ports:
       - 6379:6379
-#    volumes:
-#      - redis-data:/data
+    volumes:
+      - redis-data:/data
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       interval: 30s
@@ -24,53 +24,54 @@ services:
       - 5540:5540
     depends_on:
       - redis
-#    volumes:
-#      - redis-insight:/data
+    volumes:
+      - redis-insight:/data
 
-#  api:
-#    build: .
-#    container_name: api
-#    hostname: api
-#    command: gunicorn --workers=3 --timeout=120 --bind 0.0.0.0:8000 cracktech.wsgi --reload
-#    restart: unless-stopped
-#    volumes:
-#      - .:/app
-#    env_file:
-#      - .env
-#    ports:
-#      - 8000:8000
-#    depends_on:
-#      - redis
+  api:
+    build: .
+    container_name: api
+    hostname: api
+    command: gunicorn --workers=3 --timeout=120 --bind 0.0.0.0:8000 cracktech.wsgi --reload
+    restart: unless-stopped
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
+    depends_on:
+      - redis
+      - postgres
 
-#  postgres:
-#    image: postgres:latest
-#    container_name: postgres
-#    hostname: postgres
-#    restart: unless-stopped
-#    ports:
-#      - 5432:5432
-#    env_file:
-#      - .env
-#    volumes:
-#      - pg_data:/var/lib/postgresql/data
-#
-#  pgadmin:
-#    image: dpage/pgadmin4:latest
-#    container_name: pgadmin
-#    hostname: pgadmin
-#    restart: unless-stopped
-#    ports:
-#      - 8888:80
-#    env_file:
-#      - .env
-#    volumes:
-#      - pgadmin_data:/var/lib/pgadmin
-#    depends_on:
-#      - postgres
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    hostname: postgres
+    restart: unless-stopped
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - pg_data:/var/lib/postgresql/data
 
-#volumes:
-#  redis-data:
-#  redis-insight
-#  rabbitmq_data:
-#  pg_data:
-#  pgadmin_data:
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    hostname: pgadmin
+    restart: unless-stopped
+    ports:
+      - 8888:80
+    env_file:
+      - .env
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
+volumes:
+  redis-data:
+  redis-insight:
+  rabbitmq_data:
+  pg_data:
+  pgadmin_data:
