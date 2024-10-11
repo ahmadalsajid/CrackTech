@@ -26,20 +26,21 @@ services:
       - redis
 #    volumes:
 #      - redis-insight:/data
-  api:
-    build: .
-    container_name: api
-    hostname: api
-    command: gunicorn --workers=3 --timeout=120 --bind 0.0.0.0:8000 cracktech.wsgi --reload
-    restart: unless-stopped
-    volumes:
-      - .:/app
-    env_file:
-      - .env
-    ports:
-      - 8000:8000
-    depends_on:
-      - redis
+
+#  api:
+#    build: .
+#    container_name: api
+#    hostname: api
+#    command: gunicorn --workers=3 --timeout=120 --bind 0.0.0.0:8000 cracktech.wsgi --reload
+#    restart: unless-stopped
+#    volumes:
+#      - .:/app
+#    env_file:
+#      - .env
+#    ports:
+#      - 8000:8000
+#    depends_on:
+#      - redis
 
 #  postgres:
 #    image: postgres:latest

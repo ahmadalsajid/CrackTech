@@ -33,12 +33,14 @@ class QuestionAdmin(admin.ModelAdmin):
 
 
 class FavoriteQuestionAdmin(admin.ModelAdmin):
-    list_display = ('get_question', 'get_user',)
+    # list_display = ('get_question', 'get_user',)
+    list_display = ('get_user','get_questions')
     search_fields = ('question__question', 'user__username', 'user__email', 'user__first_name', 'user__last_name')
 
 
 class ReadQuestionAdmin(admin.ModelAdmin):
-    list_display = ('get_question', 'get_user',)
+    # list_display = ('get_question', 'get_user',)
+    list_display = ('get_user','get_questions')
     search_fields = ('question__question', 'user__username', 'user__email', 'user__first_name', 'user__last_name')
 
 admin.site.register(Tag, TagAdmin)

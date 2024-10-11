@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Tag, Question
+from .models import Tag, Question, FavoriteQuestion
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -12,4 +12,10 @@ class TagSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
+        fields = '__all__'
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True, read_only=True)
+    class Meta:
+        model = FavoriteQuestion
         fields = '__all__'

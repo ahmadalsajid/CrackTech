@@ -9,7 +9,6 @@ from pprint import pprint
 from random import randint, sample
 from users.models import User
 from dotenv import load_dotenv
-import time
 
 load_dotenv()
 
@@ -53,12 +52,12 @@ class Command(BaseCommand):
             _syntax = Tag.objects.create(name='Syntax', parent=_eng_lang)
             _wo = Tag.objects.create(name='Word Order', parent=_syntax)
             _st = Tag.objects.create(name='Sentence Types', parent=_syntax)
-
+            print('tags created')
             # create Random questions and add random tags
             _all_tags = list(Tag.objects.values_list('id', flat=True))
             results = []
             try:
-                for _ in range(10):
+                for _ in range(20):
                     response = requests.get('https://opentdb.com/api.php?amount=50&difficulty=easy&type=multiple')
                     results.extend(response.json().get('results'))
                     time.sleep(7)
@@ -90,7 +89,7 @@ class Command(BaseCommand):
                             break
                         t = t.parent
                 question.tags.set(list(set(_tags)))
-
+            print('questions created')
             # create Users
             # password from .env
             _password = os.getenv('DJANGO_SUPERUSER_PASSWORD', '1qweqwe23')
@@ -112,6 +111,7 @@ class Command(BaseCommand):
                     )
                 except Exception as e:
                     ic(e)
+            print('users created')
             print(f'Data creation custom command took {time.time() - start} seconds.')
         except Exception as e:
             ic(e)

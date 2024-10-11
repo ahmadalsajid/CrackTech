@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.db import models
 from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
@@ -40,32 +41,36 @@ class Question(models.Model):
 
 
 class FavoriteQuestion(models.Model):
-    question = models.ManyToManyField(Question, related_name='favorites', blank=True, db_index=True)
-    user = models.ManyToManyField(User, related_name='favorites', blank=True, db_index=True)
+    questions = models.ManyToManyField(Question, related_name='favorites', blank=True, db_index=True)
+    user = models.OneToOneField(User, related_name='favorite', db_index=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def get_question(self):
-        return self.question
+    @admin.display(description='Favourite questions')
+    def get_questions(self):
+        return list(self.questions.all().values_list('id', flat=True))
 
+    @admin.display(description='User')
     def get_user(self):
-        return self.user
+        return self.user.username
 
     class Meta:
         ordering = ['-created_at']
 
 
 class ReadQuestion(models.Model):
-    question = models.ManyToManyField(Question, related_name='reads', blank=True, db_index=True)
-    user = models.ManyToManyField(User, related_name='reads', blank=True, db_index=True)
+    questions = models.ManyToManyField(Question, related_name='reads', blank=True, db_index=True)
+    user = models.OneToOneField(User, related_name='read', db_index=True, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def get_question(self):
-        return self.question
+    @admin.display(description='Read questions')
+    def get_questions(self):
+        return list(self.questions.all().values_list('id', flat=True))
 
+    @admin.display(description='User')
     def get_user(self):
-        return self.user
+        return self.user.username
 
     class Meta:
         ordering = ['-created_at']
