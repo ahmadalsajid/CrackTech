@@ -32,3 +32,5 @@ urlpatterns = [
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ] + debug_toolbar_urls()
+
+urlpatterns += [path('silk/', include('silk.urls', namespace='silk'))]

@@ -28,6 +28,9 @@ populate some data for testing. It might take ~10 minutes or so.
 $ docker compose exec api python /app/manage.py create_data
 ```
 
+You can check all the data visually fom the Django Admin panel at <http://localhost:8000/admin/>.  
+Also, you can check the query insights from <http://localhost:8000/silk/>
+
 Once you are done, remove all the containers and associated objects by
 
 ```
