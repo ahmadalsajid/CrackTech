@@ -18,11 +18,17 @@ class TagSummaryViewSet(viewsets.ViewSet):
     # pagination_class = CustomPagination
 
     @extend_schema(
+        parameters=[
+            OpenApiParameter(name='tag_id',
+                             description='Filter by tag',
+                             required=False,
+                             type=int),
+        ],
         description='Get tags and associated summary',
         responses=NestedTagSerializer(many=True),
     )
-    # @method_decorator(cache_page(60 * 15))  # ( second x minute)
-    # @method_decorator(vary_on_cookie)
+    @method_decorator(cache_page(60 * 15))  # ( second x minute)
+    @method_decorator(vary_on_cookie)
     def list(self, request):
         _tag_id = request.query_params.get('tag_id', None)
         if _tag_id:
