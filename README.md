@@ -49,6 +49,13 @@ The user can:
 * View all their "Favorite" questions.
     * All Favorite questions API: [View All Favorite Question API](#view-all-favorite-question-api)
 
+
+Query:
+1. GET - Tag list in each step with ( Tag total Question Count, user total read count, user total favorite count ). Example: Show all Tags under “Parts of Speech” Tag with all count
+2. GET - Filter Question based on (“all”) ( All Question in the tag ). Example: i want to see all question under “Noun” Tag
+3. GET - Filter Question based on (“read”) ( All Read Question in the tag ). Example: i want to see all question under “Noun” Tag which i have already marked as “Read”
+4. GET - Filter Question based on (“!read”) ( All Unread Question in the tag ). Example: i want to see all question under “Noun” Tag which i have not read yet.
+
 ## API Documentation
 
 * **Swagger-UI**: http://localhost:8000/api/schema/swagger-ui/
@@ -355,3 +362,4 @@ Content-Type: application/json; charset=utf-8
 * https://www.django-rest-framework.org/api-guide/caching/
 * https://forum.djangoproject.com/t/redis-cache-in-django-5-0/27131
 * https://stackoverflow.com/questions/71431687/how-to-generate-a-schema-for-a-custom-pagination-in-django-rfw-with-drf-spectacu
+* https://forum.djangoproject.com/t/get-all-children-of-self-referencing-django-model-in-nested-hierarchy/16761

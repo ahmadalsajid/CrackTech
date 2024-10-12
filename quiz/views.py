@@ -3,7 +3,7 @@ from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status
 from icecream import ic
-from quiz.serializers import TagSerializer, QuestionSerializer, FavoriteSerializer
+from quiz.serializers import TagSerializer, QuestionSerializer, NestedTagSerializer
 from quiz.models import Tag, Question, FavoriteQuestion, ReadQuestion
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -12,6 +12,25 @@ from django.views.decorators.vary import vary_on_cookie
 from django.views.decorators.cache import cache_page
 from users.views import CustomPagination
 from django.db import connection, reset_queries
+
+
+class TagSummaryViewSet(viewsets.ViewSet):
+    # pagination_class = CustomPagination
+
+    @extend_schema(
+        description='Get tags and associated summary',
+        responses=NestedTagSerializer(many=True),
+    )
+    # @method_decorator(cache_page(60 * 15))  # ( second x minute)
+    # @method_decorator(vary_on_cookie)
+    def list(self, request):
+        _tag_id = request.query_params.get('tag_id', None)
+        if _tag_id:
+            queryset = Tag.objects.filter(id=_tag_id).select_related('parent')
+        else:
+            queryset = Tag.objects.filter(parent=None)
+        _s = NestedTagSerializer(queryset, many=True)
+        return Response(_s.data, status=status.HTTP_200_OK)
 
 
 class TagViewSet(viewsets.ViewSet):

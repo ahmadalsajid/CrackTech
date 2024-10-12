@@ -1,6 +1,7 @@
 from django.urls import path
 from quiz.views import (
     TagViewSet,
+    TagSummaryViewSet,
     QuestionViewSet,
     FavoriteViewSet,
     ReadViewSet,
@@ -8,6 +9,9 @@ from quiz.views import (
 
 urlpatterns = [
     path('tags/', TagViewSet.as_view({
+        'get': 'list',
+    })),
+    path('tags-summary/', TagSummaryViewSet.as_view({
         'get': 'list',
     })),
     path('questions/', QuestionViewSet.as_view({

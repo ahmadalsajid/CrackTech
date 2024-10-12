@@ -4,7 +4,7 @@ from users.views import (
 )
 
 urlpatterns = [
-    path('Dashboard/', DashboardViewSet.as_view({
+    path('dashboard/', DashboardViewSet.as_view({
         'get': 'list',
     })),
 ]
