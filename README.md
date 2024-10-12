@@ -36,25 +36,35 @@ The user can:
 
 * Login API: [Login API](#login-api)
 * Mark questions as "Read" or "Unread."
-    * Mark Read Question API: [Mark Question as Read API](#mark-question-as-read-api)
-    * Mark Unread Question API: [Mark Question as Unread API](#mark-question-as-unread-api)
+  * Mark Read Question API: [Mark Question as Read API](#mark-question-as-read-api)
+  * Mark Unread Question API: [Mark Question as Unread API](#mark-question-as-unread-api)
 
 * Add questions to their "Favorite" list or remove them.
-    * Mark Favorite Question API: [Mark Question as Favorite API](#mark-question-as-favorite-api)
-    * Remove Favorite Question API: [Remove Question as Favorite API](#remove-question-as-favorite-api)
+  * Mark Favorite Question API: [Mark Question as Favorite API](#mark-question-as-favorite-api)
+  * Remove Favorite Question API: [Remove Question as Favorite API](#remove-question-as-favorite-api)
 * Use a filter option at the top of the page to view only "Read" questions (e.g., if the user has marked 10 questions as read, they will see only those 10).
-    * All Read Questions API: [View All Read Question API](#view-all-read-question-api) 
+  * All Read Questions API: [View All Read Question API](#view-all-read-question-api) 
 * Filter for "Unread" questions, excluding those 10.
-    * All unread Questions API: [View All Unread Question API](#view-all-unread-question-api)
+  * All unread Questions API: [View All Unread Question API](#view-all-unread-question-api)
 * View all their "Favorite" questions.
-    * All Favorite questions API: [View All Favorite Question API](#view-all-favorite-question-api)
+  * All Favorite questions API: [View All Favorite Question API](#view-all-favorite-question-api)
 
 
 Query:
-1. GET - Tag list in each step with ( Tag total Question Count, user total read count, user total favorite count ). Example: Show all Tags under “Parts of Speech” Tag with all count
-2. GET - Filter Question based on (“all”) ( All Question in the tag ). Example: i want to see all question under “Noun” Tag
-3. GET - Filter Question based on (“read”) ( All Read Question in the tag ). Example: i want to see all question under “Noun” Tag which i have already marked as “Read”
-4. GET - Filter Question based on (“!read”) ( All Unread Question in the tag ). Example: i want to see all question under “Noun” Tag which i have not read yet.
+1. GET - Tag list in each step with ( Tag total Question Count, user total read
+count, user total favorite count ). Example: Show all Tags under “Parts of 
+Speech” Tag with all count
+   * Tag summary API: [Tag Summary API](#tag-summary-api)
+
+2. GET - Filter Question based on (“all”) ( All Question in the tag ). Example:
+i want to see all question under “Noun” Tag
+
+3. GET - Filter Question based on (“read”) ( All Read Question in the tag ). 
+Example: i want to see all question under “Noun” Tag which i have already 
+marked as “Read”
+4. GET - Filter Question based on (“!read”) ( All Unread Question in the 
+tag ). Example: i want to see all question under “Noun” Tag which i have 
+not read yet.
 
 ## API Documentation
 
@@ -265,7 +275,6 @@ Content-Type: application/json; charset=utf-8
 }
 ```
 
-
 ### View All Read Question API
 
 Make a `GET` request to <http://localhost:8000/api/quiz/reads/> with the `JWT token` in the
@@ -354,6 +363,266 @@ Content-Type: application/json; charset=utf-8
         },
         ...
 }
+```
+
+### Tag Summary API
+
+Make a `GET` request to <http://localhost:8000/api/quiz/tags-summary/> with the
+`JWT token` in the Authorization header. Also, you can set any child tag as the 
+parent to get data by passing the `tag_id` appending the query params, 
+i.e. `?tag_id=2`
+
+```bash
+GET http://localhost:8000/api/quiz/tags-summary/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1
+```
+
+You will get the response in a JSON format (when no parent is selected)
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+[
+    {
+        "id": 1,
+        "total_questions": 1000,
+        "user_total_favorites": 250,
+        "user_total_reads": 250,
+        "name": "English Language",
+        "parent": null,
+        "tags": [
+            {
+                "id": 28,
+                "total_questions": 204,
+                "user_total_favorites": 250,
+                "user_total_reads": 250,
+                "name": "Syntax",
+                "parent": 1,
+                "tags": [
+                    {
+                        "id": 30,
+                        "total_questions": 70,
+                        "user_total_favorites": 219,
+                        "user_total_reads": 248,
+                        "name": "Sentence Types",
+                        "parent": 28,
+                        "tags": []
+                    },
+                    {
+                        "id": 29,
+                        "total_questions": 68,
+                        "user_total_favorites": 207,
+                        "user_total_reads": 249,
+                        "name": "Word Order",
+                        "parent": 28,
+                        "tags": []
+                    }
+                ]
+            },
+            ...            
+            {
+                "id": 2,
+                "total_questions": 516,
+                "user_total_favorites": 250,
+                "user_total_reads": 250,
+                "name": "Parts of Speech",
+                "parent": 1,
+                "tags": [
+                    {
+                        "id": 9,
+                        "total_questions": 178,
+                        "user_total_favorites": 243,
+                        "user_total_reads": 250,
+                        "name": "Adjective",
+                        "parent": 2,
+                        "tags": [
+                            {
+                                "id": 11,
+                                "total_questions": 49,
+                                "user_total_favorites": 191,
+                                "user_total_reads": 246,
+                                "name": "Superlative",
+                                "parent": 9,
+                                "tags": []
+                            },
+                            {
+                                "id": 10,
+                                "total_questions": 60,
+                                "user_total_favorites": 189,
+                                "user_total_reads": 250,
+                                "name": "Comparative",
+                                "parent": 9,
+                                "tags": []
+                            }
+                        ]
+                    },
+                    {
+                        "id": 6,
+                        "total_questions": 182,
+                        "user_total_favorites": 245,
+                        "user_total_reads": 250,
+                        "name": "Verb",
+                        "parent": 2,
+                        "tags": [
+                            {
+                                "id": 8,
+                                "total_questions": 62,
+                                "user_total_favorites": 213,
+                                "user_total_reads": 250,
+                                "name": "Linking Verb",
+                                "parent": 6,
+                                "tags": []
+                            },
+                            {
+                                "id": 7,
+                                "total_questions": 69,
+                                "user_total_favorites": 218,
+                                "user_total_reads": 249,
+                                "name": "Action Verb",
+                                "parent": 6,
+                                "tags": []
+                            }
+                        ]
+                    },
+                    {
+                        "id": 3,
+                        "total_questions": 173,
+                        "user_total_favorites": 248,
+                        "user_total_reads": 250,
+                        "name": "Noun",
+                        "parent": 2,
+                        "tags": [
+                            {
+                                "id": 5,
+                                "total_questions": 51,
+                                "user_total_favorites": 198,
+                                "user_total_reads": 248,
+                                "name": "Common Noun",
+                                "parent": 3,
+                                "tags": []
+                            },
+                            {
+                                "id": 4,
+                                "total_questions": 69,
+                                "user_total_favorites": 213,
+                                "user_total_reads": 248,
+                                "name": "Proper Noun",
+                                "parent": 3,
+                                "tags": []
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    }
+]
+```
+
+Or, you will get the response in a JSON format (when a tag is selected),
+i.e. `http://localhost:8000/api/quiz/tags-summary/?tag_id=2`
+
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+[
+    {
+        "id": 2,
+        "total_questions": 516,
+        "user_total_favorites": 250,
+        "user_total_reads": 250,
+        "name": "Parts of Speech",
+        "parent": 1,
+        "tags": [
+            {
+                "id": 9,
+                "total_questions": 178,
+                "user_total_favorites": 243,
+                "user_total_reads": 250,
+                "name": "Adjective",
+                "parent": 2,
+                "tags": [
+                    {
+                        "id": 11,
+                        "total_questions": 49,
+                        "user_total_favorites": 191,
+                        "user_total_reads": 246,
+                        "name": "Superlative",
+                        "parent": 9,
+                        "tags": []
+                    },
+                    {
+                        "id": 10,
+                        "total_questions": 60,
+                        "user_total_favorites": 189,
+                        "user_total_reads": 250,
+                        "name": "Comparative",
+                        "parent": 9,
+                        "tags": []
+                    }
+                ]
+            },
+            {
+                "id": 6,
+                "total_questions": 182,
+                "user_total_favorites": 245,
+                "user_total_reads": 250,
+                "name": "Verb",
+                "parent": 2,
+                "tags": [
+                    {
+                        "id": 8,
+                        "total_questions": 62,
+                        "user_total_favorites": 213,
+                        "user_total_reads": 250,
+                        "name": "Linking Verb",
+                        "parent": 6,
+                        "tags": []
+                    },
+                    {
+                        "id": 7,
+                        "total_questions": 69,
+                        "user_total_favorites": 218,
+                        "user_total_reads": 249,
+                        "name": "Action Verb",
+                        "parent": 6,
+                        "tags": []
+                    }
+                ]
+            },
+            {
+                "id": 3,
+                "total_questions": 173,
+                "user_total_favorites": 248,
+                "user_total_reads": 250,
+                "name": "Noun",
+                "parent": 2,
+                "tags": [
+                    {
+                        "id": 5,
+                        "total_questions": 51,
+                        "user_total_favorites": 198,
+                        "user_total_reads": 248,
+                        "name": "Common Noun",
+                        "parent": 3,
+                        "tags": []
+                    },
+                    {
+                        "id": 4,
+                        "total_questions": 69,
+                        "user_total_favorites": 213,
+                        "user_total_reads": 248,
+                        "name": "Proper Noun",
+                        "parent": 3,
+                        "tags": []
+                    }
+                ]
+            }
+        ]
+    }
+]
 ```
 
 ## References
