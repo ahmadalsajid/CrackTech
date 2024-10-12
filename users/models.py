@@ -1,6 +1,5 @@
 from django.contrib.auth.hashers import identify_hasher
 from django.db import models
-from enum import Enum
 from django.contrib.auth.models import AbstractUser
 from django.db.models.signals import post_save
 from django.dispatch import receiver

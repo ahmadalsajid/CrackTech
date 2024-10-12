@@ -30,7 +30,7 @@ class TagSummaryViewSet(viewsets.ViewSet):
     def list(self, request):
         _tag_id = request.query_params.get('tag_id', None)
         if _tag_id:
-            queryset = Tag.objects.filter(id=_tag_id).select_related('parent')
+            queryset = Tag.objects.filter(id=_tag_id)
         else:
             queryset = Tag.objects.filter(parent=None)
         _s = NestedTagSerializer(queryset, many=True)
@@ -69,7 +69,7 @@ class QuestionViewSet(viewsets.ViewSet):
                              description='Filter by favorite questions',
                              required=False,
                              type=str,
-                             enum=['true',]),
+                             enum=['true', ]),
         ],
         description='Get read questions',
         responses=QuestionSerializer(many=True),
@@ -87,15 +87,15 @@ class QuestionViewSet(viewsets.ViewSet):
         if tag_id:
             queryset = queryset.filter(tags__id=tag_id)
 
-        if _read_status and _read_status.lower()=='unread':
+        if _read_status and _read_status.lower() == 'unread':
             _excluded_questions = list(_user.read.questions.values_list('id', flat=True)) if _user.read else []
             queryset = queryset.exclude(id__in=_excluded_questions)
             pass
-        elif _read_status and _read_status.lower()=='read':
+        elif _read_status and _read_status.lower() == 'read':
             _included_questions = list(_user.read.questions.values_list('id', flat=True)) if _user.read else []
             queryset = queryset.filter(id__in=_included_questions)
 
-        if _favorite_status and _favorite_status.lower()=='true':
+        if _favorite_status and _favorite_status.lower() == 'true':
             _included_questions = list(_user.favorite.questions.values_list('id', flat=True)) if _user.favorite else []
             queryset = queryset.filter(id__in=_included_questions)
 

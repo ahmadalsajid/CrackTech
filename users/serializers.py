@@ -5,8 +5,6 @@ from rest_framework_simplejwt.serializers import (
 )
 from rest_framework_simplejwt.settings import api_settings
 from django.contrib.auth.models import update_last_login
-from icecream import ic
-from .models import User
 
 
 class LoginViewSerializer(TokenObtainPairSerializer):
@@ -20,4 +18,3 @@ class LoginViewSerializer(TokenObtainPairSerializer):
             update_last_login(None, self.user)
 
         return data
-

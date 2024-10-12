@@ -4,7 +4,6 @@ from django.dispatch import receiver
 from django.db.models.signals import post_save, pre_save
 from users.models import User
 from icecream import ic
-from pprint import pprint
 from django.db import connection, reset_queries
 
 
