@@ -1,6 +1,7 @@
 # CrackTech
 
 Coding round
+
 ## Run the project ##  
 
 You need to have docker installed on your machine for testing the application
@@ -12,19 +13,20 @@ After that, clone this repository to your machine.
 ```commandline
 git clone https://github.com/ahmadalsajid/CrackTech.git
 ```
-Now, `cd` into the `CrackTech` directory and rename `sample.env` to `env`. Put 
+
+Now, `cd` into the `CrackTech` directory and rename `sample.env` to `env`. Put
 your own credentials there, if you want to. Now, spin up the containers
+
 ```
 $ docker compose up
 ```
 
-After all the containers are up and running, execute the custom command to 
-populate some data for testing. It might take ~10 minutes.
+After all the containers are up and running, execute the custom command to
+populate some data for testing. It might take ~10 minutes or so.
 
 ```
 $ docker compose exec api python /app/manage.py create_data
 ```
-
 
 Once you are done, remove all the containers and associated objects by
 
@@ -36,35 +38,39 @@ The user can:
 
 * Login API: [Login API](#login-api)
 * Mark questions as "Read" or "Unread."
-  * Mark Read Question API: [Mark Question as Read API](#mark-question-as-read-api)
-  * Mark Unread Question API: [Mark Question as Unread API](#mark-question-as-unread-api)
+    * Mark Read Question API: [Mark Question as Read API](#mark-question-as-read-api)
+    * Mark Unread Question API: [Mark Question as Unread API](#mark-question-as-unread-api)
 
 * Add questions to their "Favorite" list or remove them.
-  * Mark Favorite Question API: [Mark Question as Favorite API](#mark-question-as-favorite-api)
-  * Remove Favorite Question API: [Remove Question as Favorite API](#remove-question-as-favorite-api)
-* Use a filter option at the top of the page to view only "Read" questions (e.g., if the user has marked 10 questions as read, they will see only those 10).
-  * All Read Questions API: [View All Read Question API](#view-all-read-question-api) 
+    * Mark Favorite Question API: [Mark Question as Favorite API](#mark-question-as-favorite-api)
+    * Remove Favorite Question API: [Remove Question as Favorite API](#remove-question-as-favorite-api)
+* Use a filter option at the top of the page to view only "Read" questions (e.g., if the user has marked 10 questions as
+  read, they will see only those 10).
+    * All Read Questions API: [View All Read Question API](#view-all-read-question-api)
 * Filter for "Unread" questions, excluding those 10.
-  * All unread Questions API: [View All Unread Question API](#view-all-unread-question-api)
+    * All unread Questions API: [View All Unread Question API](#view-all-unread-question-api)
 * View all their "Favorite" questions.
-  * All Favorite questions API: [View All Favorite Question API](#view-all-favorite-question-api)
-
+    * All Favorite questions API: [View All Favorite Question API](#view-all-favorite-question-api)
 
 Query:
+
 1. GET - Tag list in each step with ( Tag total Question Count, user total read
-count, user total favorite count ). Example: Show all Tags under “Parts of 
-Speech” Tag with all count
-   * Tag summary API: [Tag Summary API](#tag-summary-api)
+   count, user total favorite count ). Example: Show all Tags under “Parts of
+   Speech” Tag with all count
+    * Tag summary API: [Tag Summary API](#tag-summary-api)
 
 2. GET - Filter Question based on (“all”) ( All Question in the tag ). Example:
-i want to see all question under “Noun” Tag
+   I want to see all question under “Noun” Tag
+    * Questions API: [Get Questions API](#get-questions-api)
 
-3. GET - Filter Question based on (“read”) ( All Read Question in the tag ). 
-Example: i want to see all question under “Noun” Tag which i have already 
-marked as “Read”
-4. GET - Filter Question based on (“!read”) ( All Unread Question in the 
-tag ). Example: i want to see all question under “Noun” Tag which i have 
-not read yet.
+3. GET - Filter Question based on (“read”) ( All Read Question in the tag ).
+   Example: I want to see all question under “Noun” Tag which i have already
+   marked as “Read”
+    * Questions API: [Get Questions API](#get-questions-api)
+4. GET - Filter Question based on (“!read”) ( All Unread Question in the
+   tag ). Example: I want to see all question under “Noun” Tag which I have
+   not read yet.
+    * Questions API: [Get Questions API](#get-questions-api)
 
 ## API Documentation
 
@@ -95,6 +101,55 @@ Content-Type: application/json; charset=utf-8
         "refresh": "eyJhbxxxx.bkxxxxiOjF9.l9zxxxxslSQ",
         "access": "eyJhbxxxx.eyJxxxxX0.qSOxxxxIY"
     }
+}
+```
+
+### Get Questions API
+
+Make a `GET` request to <http://localhost:8000/api/quiz/questions/> with the `JWT token` in the
+Authorization header. If you want to filter by Tag, pass tag ID in query param,
+i.e. `tag_id=5`, to filter by `read` or `unread` questions, add query param
+`status=read` or `status=unread` respectively. To filter favourite questions,
+pass `favorite=true` in the URL. So, the complete URL would be
+<http://localhost:8000/api/quiz/questions/?tag_id=5&status=read&favorite=true>
+
+```bash
+GET http://localhost:8000/api/quiz/questions/
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJKV1
+```
+
+You will get the response in a JSON format
+
+```bash
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+{
+    "count": 12,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 300,
+            "question": "What album did The Lumineers release in 2016?",
+            "option_1": "Winter",
+            "option_2": "Cleopatra",
+            "option_3": "The Lumineers",
+            "option_4": "Tracks From The Attic",
+            "correct_answer": 2,
+            "created_at": "2024-10-11T00:29:43.475159Z",
+            "updated_at": "2024-10-11T00:29:43.475239Z",
+            "tags": [
+                19,
+                12,
+                7,
+                6,
+                2,
+                1
+            ],
+            "users": []
+        },
+        ...
 }
 ```
 
@@ -368,8 +423,8 @@ Content-Type: application/json; charset=utf-8
 ### Tag Summary API
 
 Make a `GET` request to <http://localhost:8000/api/quiz/tags-summary/> with the
-`JWT token` in the Authorization header. Also, you can set any child tag as the 
-parent to get data by passing the `tag_id` appending the query params, 
+`JWT token` in the Authorization header. Also, you can set any child tag as the
+parent to get data by passing the `tag_id` appending the query params,
 i.e. `?tag_id=2`
 
 ```bash
@@ -522,7 +577,6 @@ Content-Type: application/json; charset=utf-8
 
 Or, you will get the response in a JSON format (when a tag is selected),
 i.e. `http://localhost:8000/api/quiz/tags-summary/?tag_id=2`
-
 
 ```bash
 HTTP/1.1 200 OK

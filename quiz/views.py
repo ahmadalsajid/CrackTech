@@ -1,5 +1,3 @@
-from django.shortcuts import get_object_or_404
-from django.db import IntegrityError, transaction
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from rest_framework import status
 from icecream import ic
@@ -56,14 +54,58 @@ class TagViewSet(viewsets.ViewSet):
 class QuestionViewSet(viewsets.ViewSet):
     pagination_class = CustomPagination
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(name='status',
+                             description='Filter by Question read or unread',
+                             required=False,
+                             type=str,
+                             enum=['read', 'unread']),
+            OpenApiParameter(name='tag_id',
+                             description='Filter by tag',
+                             required=False,
+                             type=int),
+            OpenApiParameter(name='favorite',
+                             description='Filter by favorite questions',
+                             required=False,
+                             type=str,
+                             enum=['true',]),
+        ],
+        description='Get read questions',
+        responses=QuestionSerializer(many=True),
+    )
     @method_decorator(cache_page(60 * 15))  # ( second x minute)
     @method_decorator(vary_on_cookie)
     def list(self, request):
+        # reset_queries()
+        _user = request.user
+        tag_id = request.GET.get('tag_id', None)
+        _read_status = request.GET.get('status', None)  # choices = [read, unread]
+        _favorite_status = request.GET.get('favorite', None)  # choices = [read, unread]
+
         queryset = Question.objects.all()
+        if tag_id:
+            queryset = queryset.filter(tags__id=tag_id)
+
+        if _read_status and _read_status.lower()=='unread':
+            _excluded_questions = list(_user.read.questions.values_list('id', flat=True)) if _user.read else []
+            queryset = queryset.exclude(id__in=_excluded_questions)
+            pass
+        elif _read_status and _read_status.lower()=='read':
+            _included_questions = list(_user.read.questions.values_list('id', flat=True)) if _user.read else []
+            queryset = queryset.filter(id__in=_included_questions)
+
+        if _favorite_status and _favorite_status.lower()=='true':
+            _included_questions = list(_user.favorite.questions.values_list('id', flat=True)) if _user.favorite else []
+            queryset = queryset.filter(id__in=_included_questions)
+
         paginator = self.pagination_class()
         result_page = paginator.paginate_queryset(queryset, request)
         _serialize = QuestionSerializer(result_page, many=True)
         # return Response(_serialize.data, status=status.HTTP_200_OK)
+
+        # ic(connection.queries)
+        # ic(len(connection.queries))
         return paginator.get_paginated_response(_serialize.data)
 
 

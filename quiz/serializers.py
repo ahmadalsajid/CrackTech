@@ -10,7 +10,6 @@ class NestedTagSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tag
-        # fields = '__all__'
         exclude = ['created_at', 'updated_at']
 
     def to_representation(self, instance):
@@ -52,7 +51,6 @@ class TagSerializer(serializers.ModelSerializer):
 class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
-        # fields = '__all__'
         exclude = ['created_at', 'updated_at']
 
 
@@ -61,5 +59,4 @@ class FavoriteSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = FavoriteQuestion
-        # fields = '__all__'
         exclude = ['created_at', 'updated_at']
