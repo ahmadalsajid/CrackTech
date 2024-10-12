@@ -14,7 +14,7 @@ After that, clone this repository to your machine.
 git clone https://github.com/ahmadalsajid/CrackTech.git
 ```
 
-Now, `cd` into the `CrackTech` directory and rename `sample.env` to `env`. Put
+Now, `cd` into the `CrackTech` directory and rename `sample.env` to `.env`. Put
 your own credentials there, if you want to. Now, spin up the containers
 
 ```
